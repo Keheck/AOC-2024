@@ -75,7 +75,32 @@ int main() {
         sum += abs(left_list[i] - right_list[i]);
     }
 
-    printf("%d\n", sum);
+    printf("Distance: %d\n", sum);
+
+    int left_index = 0;
+    int right_index = 0;
+    int appearance_in_right = 0;
+    long int similarity = 0;
+
+    for(left_index = 0; left_index < LINE_COUNT; left_index++) {
+        while(left_list[left_index] > right_list[right_index]) {
+            right_index++;
+
+            if(right_index == LINE_COUNT) break;
+        }
+
+        while(left_list[left_index] == right_list[right_index]) {
+            appearance_in_right++;
+            right_index++;
+
+            if(right_index == LINE_COUNT) break;
+        }
+
+        similarity += appearance_in_right * left_list[left_index];
+        appearance_in_right = 0;
+    }
+
+    printf("Similarity: %ld\n", similarity);
 
     fclose(finput);
     return 0;
