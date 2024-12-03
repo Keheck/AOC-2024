@@ -19,7 +19,10 @@ int main() {
     char *value_string;
     char is_ascending = -1;
     char *end;
+    char tolerating = 1;
 
+    // NOTE: First pair doesn't necessarily define the direction that the values have to go
+    // Possible solution: Try to check if skipping the first value makes the line valid
     while(1) {
         fgets(report_line, MAX_LINE_LENGTH, reports_file);
         if(feof(reports_file))
@@ -34,7 +37,13 @@ int main() {
         is_ascending = report_value > last_value;
 
         if(abs(report_value - last_value) < 1 || abs(report_value - last_value) > 3) {
-            continue;
+            if(tolerating) {
+                tolerating = 0;
+                is_ascending = -1;
+            }
+            else {
+                continue;
+            }
         }
 
         while(value_string = strtok(0, " ")) {
@@ -42,17 +51,35 @@ int main() {
             report_value = atoi(value_string);
 
             if(abs(report_value - last_value) < 1 || abs(report_value - last_value) > 3) {
-                break;
+                if(tolerating) {
+                    tolerating = 0;
+                    continue;
+                }
+                else {
+                    break;
+                }
+            }
+
+            if(is_ascending == -1) {
+                is_ascending = report_value > last_value;
             }
 
             if((is_ascending && report_value < last_value) || (!is_ascending && report_value > last_value)) {
-                break;
+                if(tolerating) {
+                    tolerating = 0;
+                    continue;
+                }
+                else {
+                    break;
+                }
             }
         }
 
         if(value_string == 0) {
             safe_reports++;
         }
+
+        tolerating = 1;
     }
 
     printf("Safe values: %d\n", safe_reports);
